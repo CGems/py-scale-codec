@@ -238,6 +238,34 @@ class H512(ScaleType):
         return '0x{}'.format(self.get_next_bytes(64).hex())
 
 
+class SlotNumber(ScaleType):
+
+    def process(self):
+        return int(int.from_bytes(self.get_next_bytes(8), byteorder='little'))
+
+    def encode(self, value):
+        if 0 <= value <= 2**64 - 1:
+            self.data = ScaleBytes(bytearray(int(value).to_bytes(8, 'little')))
+        else:
+            raise ValueError('{} out of range for SlotNumber'.format(value))
+
+        return self.data
+
+
+class BabeBlockWeight(ScaleType):
+
+    def process(self):
+        return int.from_bytes(self.get_next_bytes(4), byteorder='little')
+
+    def encode(self, value):
+        if 0 <= value <= 2**32 - 1:
+            self.data = ScaleBytes(bytearray(int(value).to_bytes(4, 'little')))
+        else:
+            raise ValueError('{} out of range for BabeBlockWeight'.format(value))
+
+        return self.data
+
+
 class VecU8Length32(ScaleType):
     type_string = '[u8; 32]'
 
