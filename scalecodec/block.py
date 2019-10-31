@@ -363,3 +363,29 @@ class LogDigest(Enum):
         self.log_type = self.process_type(self.value_list[self.index])
         return {'type': self.log_type.type_string, 'value': self.log_type.value}
 
+
+class RawBabePreDigestPrimary(Struct):
+    type_mapping = (
+        ('authorityIndex', 'u32'),
+        ('slotNumber', 'SlotNumber'),
+        ('weight', 'BabeBlockWeight'),
+        ('vrfOutput', 'H256'),
+        ('vrfProof', 'H256'),
+    )
+
+
+class RawBabePreDigestSecondary(Struct):
+    type_mapping = (
+        ('authorityIndex', 'u32'),
+        ('slotNumber', 'SlotNumber'),
+        ('weight', 'BabeBlockWeight'),
+    )
+
+
+class RawBabePreDigest(Struct):
+    type_reflect = {'Primary': 'RawBabePreDigestPrimary', 'Secondary': 'RawBabePreDigestSecondary'}
+
+    def process(self):
+        label = self.process_type("Enum", value_list=['Primary', 'Secondary']).value
+        result = {label: self.process_type(self.type_reflect[label]).value}
+        return result
